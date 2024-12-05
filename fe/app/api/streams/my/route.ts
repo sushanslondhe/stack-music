@@ -1,20 +1,20 @@
 import { prisma } from "@/app/lib";
 import { getServerSession } from "next-auth";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   const session = await getServerSession();
 
-  // if (!session?.user) {
-  //   return NextResponse.json(
-  //     {
-  //       message: "Unauthenticated",
-  //     },
-  //     {
-  //       status: 403,
-  //     }
-  //   );
-  // }
+  if (!session?.user) {
+    return NextResponse.json(
+      {
+        message: "Unauthenticated",
+      },
+      {
+        status: 403,
+      }
+    );
+  }
   const user = session.user;
 
   const streams = await prisma.stream.findMany({

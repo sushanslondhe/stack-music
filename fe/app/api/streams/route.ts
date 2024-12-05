@@ -1,6 +1,6 @@
 import { prisma } from "@/app/lib";
 import { YT_REGEX } from "@/app/lib/utils";
-// import { getServerSession } from "next-auth";
+import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 //@ts-expect-error api
@@ -12,35 +12,34 @@ const createStreamSchema = z.object({
 });
 export async function POST(req: NextRequest) {
   try {
-    // const session = await getServerSession();
+    const session = await getServerSession();
 
-    // if (!session?.user) {
-    //   return NextResponse.json(
-    //     {
-    //       message: "Unauthenticated",
-    //     },
-    //     {
-    //       status: 403,
-    //     }
-    //   );
-    // }
-    // const user = session.user;
+    if (!session?.user) {
+      return NextResponse.json(
+        {
+          message: "Unauthenticated",
+        },
+        {
+          status: 403,
+        }
+      );
+    }
 
     const data = await createStreamSchema.parse(await req.json());
     const isYt = data.url.match(YT_REGEX);
-    // console.log(isYt);
+    console.log(isYt);
     const videoId = data.url ? data.url.match(YT_REGEX)?.[1] : null;
 
-    // if (!isYt || videoId) {
-    //   return NextResponse.json(
-    //     {
-    //       message: "Url Youtube format is incorrect try again!!",
-    //     },
-    //     {
-    //       status: 400,
-    //     }
-    //   );
-    // }
+    if (!isYt || videoId) {
+      return NextResponse.json(
+        {
+          message: "Url Youtube format is incorrect try again!!",
+        },
+        {
+          status: 400,
+        }
+      );
+    }
 
     const res = await youtubesearchapi.GetVideoDetails(videoId);
 
